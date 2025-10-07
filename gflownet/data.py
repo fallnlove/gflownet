@@ -19,17 +19,17 @@ import torch
 """
 
 fields = [
-  'traj', 
-  'x',
-  'r',
-  'logr', 
-  'logp_guide',
+    "traj",
+    "x",
+    "r",
+    "logr",
+    "logp_guide",
 ]
-Experience = namedtuple('Experience', fields, defaults=(None,)*len(fields))
+Experience = namedtuple("Experience", fields, defaults=(None,) * len(fields))
 
 
 def make_full_exp(min_exp, args):
-  """ Construct Experience object from sampled trajectory.
+    """Construct Experience object from sampled trajectory.
 
     Parameters: minimal Experience, with fields:
     ----------
@@ -40,12 +40,12 @@ def make_full_exp(min_exp, args):
       Log probability of trajectory under guide
 
     Returns: Experience with more fields set.
-  """
-  full_exp = Experience(
-    traj = min_exp.traj,
-    x = min_exp.x,
-    r = min_exp.r,
-    logr = torch.log(torch.tensor(min_exp.r, device=args.device)),
-    logp_guide = torch.tensor(min_exp.logp_guide, device=args.device),
-  )
-  return full_exp
+    """
+    full_exp = Experience(
+        traj=min_exp.traj,
+        x=min_exp.x,
+        r=min_exp.r,
+        logr=torch.log(torch.tensor(min_exp.r, device=args.device)),
+        logp_guide=torch.tensor(min_exp.logp_guide, device=args.device),
+    )
+    return full_exp
