@@ -147,7 +147,7 @@ class Monitor:
 
         for k, v in tolog.items():
             print(f"\t{k}:\t{v}")
-        tolog['tb_loss'] = loss
+        tolog['tb_loss'] = loss.cpu().item()
         self.writer.log(tolog)
         return
 

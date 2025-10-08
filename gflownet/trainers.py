@@ -104,7 +104,7 @@ class Trainer:
                 )
                 self.monitor.log_samples(round_num, truepolicy_data)
 
-            self.monitor.maybe_eval_samplelog(self.model, round_num, allXtoR, (loss / num_online / self.args.num_steps_per_batch).detach().cpu().item())
+            self.monitor.maybe_eval_samplelog(self.model, round_num, allXtoR, (loss / num_online / self.args.num_steps_per_batch).detach())
             loss = 0
 
             if round_num % self.args.save_every_x_active_rounds == 0:
