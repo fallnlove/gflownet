@@ -5,7 +5,7 @@ from collections import namedtuple
 from tqdm import tqdm
 import ray
 import psutil, gc
-from attrdict import AttrDict
+from attrdict2 import AttrDict
 import queue
 from dataclasses import dataclass
 

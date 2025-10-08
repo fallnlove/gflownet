@@ -8,7 +8,7 @@ all of them to gather reward statistics.
 """
 
 import pickle
-from attrdict import AttrDict
+from attrdict2 import AttrDict
 from queue import LifoQueue
 
 from ..molblockmdp import MolMDP

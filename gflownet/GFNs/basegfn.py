@@ -2,7 +2,6 @@ from itertools import chain
 import numpy as np
 import torch
 from torch.distributions import Categorical
-import wandb
 from pathlib import Path
 from tqdm import tqdm
 
@@ -38,8 +37,8 @@ class BaseTBGFlowNet:
             net.to(args.device)
 
         self.clip_grad_norm_params = [
-            self.policy_fwd.parameters(),
-            self.policy_back.parameters(),
+            list(self.policy_fwd.parameters()),
+            list(self.policy_back.parameters()),
         ]
 
         self.optimizer_back = torch.optim.Adam(
@@ -128,7 +127,6 @@ class BaseTBGFlowNet:
         -------
         dataset: List of [Experience]
         """
-        print("Sampling dataset ...")
         if uniform:
             print("Using uniform forward policy on unique children ...")
             epsilon = 1.0
@@ -316,11 +314,8 @@ class BaseTBGFlowNet:
             opt.step()
         self.clamp_logZ()
 
-        if log:
-            batch_loss = tensor_to_np(batch_loss)
-            print(f"TB training:", batch_loss)
-            wandb.log({"Regular TB loss": batch_loss})
-        return
+        # batch_loss = tensor_to_np(batch_loss)
+        return batch_loss
 
     """ 
     IO & misc

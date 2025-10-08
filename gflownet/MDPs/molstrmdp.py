@@ -72,7 +72,7 @@ def randomwalk(mdp):
 
 
 def test():
-    from attrdict import AttrDict
+    from attrdict2 import AttrDict
 
     args = {
         "blocks_file": "datasets/mol/blocks_qm9_str.json",

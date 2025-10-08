@@ -39,7 +39,7 @@ class sEH_GBR_Proxy:
 
 
 def test():
-    from attrdict import AttrDict
+    from attrdict2 import AttrDict
 
     args = {"blocks_file": "datasets/sehstr/block_18.json"}
     args = AttrDict(args)

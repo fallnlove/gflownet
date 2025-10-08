@@ -2,7 +2,6 @@ from itertools import chain
 from tqdm import tqdm
 import numpy as np
 import torch
-import wandb
 
 from .basegfn import BaseTBGFlowNet, tensor_to_np
 
@@ -177,13 +176,6 @@ class SubstructureGFN(BaseTBGFlowNet):
         if log:
             logZ = tensor_to_np(self.logZ)
             print(f"{logZ=}")
-            wandb.log(
-                {
-                    "Sub back loss": loss_step1,
-                    "Sub fwdZ loss": loss_tb,
-                    "Sub logZ": logZ,
-                }
-            )
         return
 
 

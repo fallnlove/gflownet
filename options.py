@@ -1,5 +1,5 @@
 import sys, argparse, yaml
-from attrdict import AttrDict
+from attrdict2 import AttrDict
 
 
 def get_user_args():

@@ -35,12 +35,12 @@ sa_hid_dim: 128
 sa_n_layers: 2
 
 # trainer
-num_active_learning_rounds: 100000
+num_active_learning_rounds: 10000
 num_samples_per_online_batch: 16
 num_samples_per_offline_batch: 16
 
 num_steps_per_batch: 1
-num_online_batches_per_round: 1
+num_online_batches_per_round: 100
 num_offline_batches_per_round: 0
 target_mix_backpolicy_weight: 0.25  # maybe set 0
 
@@ -54,7 +54,8 @@ num_guide_workers: 30
 # experiment
 replicate: 0
 saved_models_dir: 'saved_models/'
-save_every_x_active_rounds: 100
+log_path: "tfbind_torch/"
+save_every_x_active_rounds: 1000000000
 
 # monitor
 monitor_num_samples: 128

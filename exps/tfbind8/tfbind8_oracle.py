@@ -14,6 +14,8 @@ from gflownet.GFNs import models
 from gflownet.MDPs import seqpamdp, seqinsertmdp, seqarmdp
 from gflownet.monitor import TargetRewardDistribution, Monitor
 
+from logger import Writer
+
 
 def dynamic_inherit_mdp(base, args):
     class TFBind8MDP(base):
@@ -67,15 +69,16 @@ def dynamic_inherit_mdp(base, args):
             """States are SeqPAState or SeqInsertState objects."""
             return levenshtein(state1.content, state2.content)
 
-        def make_monitor(self):
+        def make_monitor(self, writer):
             target = TargetRewardDistribution()
-            target.init_from_base_rewards(self.rs_all)
+            target.init_from_base_rewards(self.rs_all, self.scaled_oracle)
             return Monitor(
                 self.args,
                 target,
                 dist_func=self.dist_func,
                 is_mode_f=self.is_mode,
                 callback=self.add_monitor,
+                writer=writer,
             )
 
         def add_monitor(self, xs, rs, allXtoR):
@@ -102,7 +105,9 @@ def main(args):
 
     actor = actorclass(args, mdp)
     model = models.make_model(args, mdp, actor)
-    monitor = mdp.make_monitor()
+    writer = Writer()
+    writer.init(log_dir=args.log_path)
+    monitor = mdp.make_monitor(writer)
 
     # Save memory, after constructing monitor with target rewards
     del mdp.rs_all

@@ -4,7 +4,6 @@ from scipy.stats import anderson_ksamp
 from polyleven import levenshtein
 
 import torch
-import wandb
 
 from gflownet.utils import tensor_to_np
 
@@ -78,7 +77,7 @@ class TargetRewardDistribution:
         self.expected_reward = None
         self.ad_samples = []
 
-    def init_from_base_rewards(self, base_rs):
+    def init_from_base_rewards(self, base_rs, rewards_dict):
         """Compute target reward distribution statistics.
 
         Ideally, base_rs is a list of all rewards for all unique x.
@@ -91,12 +90,13 @@ class TargetRewardDistribution:
         self.ad_samples = np.random.choice(
             base_rs, size=min(len(base_rs), 100000), p=np.array(base_rs) / z
         )
+        self.rewards_dict = rewards_dict
         print(f"Expected reward: {expr}")
         return
 
 
 class Monitor:
-    def __init__(self, args, target, dist_func=None, is_mode_f=None, callback=None):
+    def __init__(self, args, target, dist_func=None, is_mode_f=None, callback=None, writer=None):
         self.args = args
         self.target = target
         self.dist_func = dist_func
@@ -106,14 +106,27 @@ class Monitor:
         self.NUM_ROUNDS_BACK = 25
         self.FAST_EVAL_EVERY = self.args.get("monitor_fast_every", 5)
         self.SLOW_EVAL_EVERY = self.args.get("monitor_slow_every", 200)
+        self.writer = writer
+
+
+        self.true_dist = self.target.rewards_dict
+        self.empirical_dist = {k: 0 for k in self.true_dist.keys()}
+        self.replay_buffer = []
+        self.replay_buffer_size = 1_000_000
 
     def log_samples(self, round_num, samples):
         """Logs samples."""
         self.sample_log[round_num] = samples
-        # print(f'Logging. {round_num=}, {len(self.sample_log)=}')
+        for exp in samples:
+            self.replay_buffer.append(exp.x)
+            self.empirical_dist[exp.x] += 1
+        if len(self.replay_buffer) > self.replay_buffer_size:
+            for i in range(len(self.replay_buffer) - self.replay_buffer_size):
+                self.empirical_dist[self.replay_buffer[i]] -= 1
+            self.replay_buffer = self.replay_buffer[-self.replay_buffer_size:]
         return
 
-    def maybe_eval_samplelog(self, model, round_num, allXtoR):
+    def maybe_eval_samplelog(self, model, round_num, allXtoR, loss):
         """Evaluate model using sample log:
         - evaluate all recent round samples, compare to target distribution
         - evaluate all samples, compare to target distribution
@@ -125,7 +138,7 @@ class Monitor:
             return
         tolog = dict()
         ds = [
-            self.eval_recent_rounds(model, round_num, allXtoR, log_slow=log_slow),
+            # self.eval_recent_rounds(model, round_num, allXtoR, log_slow=log_slow),
             self.eval_all_rounds(model, round_num, allXtoR),
             self.eval_topk(log_slow=log_slow),
         ]
@@ -134,7 +147,8 @@ class Monitor:
 
         for k, v in tolog.items():
             print(f"\t{k}:\t{v}")
-        wandb.log(tolog)
+        tolog['tb_loss'] = loss
+        self.writer.log(tolog)
         return
 
     """
@@ -159,6 +173,12 @@ class Monitor:
         chain = lambda ll: list(itertools.chain(*ll))
         samples = chain(self.sample_log[rd] for rd in all_rounds)
         tolog = self.__evaluate_samples(samples, round_num, model, allXtoR, name="all")
+        tv = 0
+        rewards_cst = sum(self.true_dist.values())
+        emp_cst = sum(self.empirical_dist.values())
+        for k, v in self.true_dist.items():
+            tv += abs(v / rewards_cst - self.empirical_dist[k] / emp_cst)
+        tolog['total variation'] = tv / 2
         return tolog
 
     def __evaluate_samples(

@@ -1,7 +1,6 @@
 import random, time
 import numpy as np
 import torch
-import wandb
 from tqdm import tqdm
 import ray
 
@@ -68,11 +67,9 @@ class Trainer:
             f"Starting active learning. \
             Each round: {num_online=}, {num_offline=}"
         )
+        loss = 0
 
         for round_num in tqdm(range(self.args.num_active_learning_rounds)):
-            print(
-                f"Starting learning round {round_num + 1} / {self.args.num_active_learning_rounds} ..."
-            )
 
             # Online training - skip first if initial dataset was provided
             if not initial_XtoR or round_num > 0:
@@ -90,7 +87,7 @@ class Trainer:
 
                     # Train on online dataset
                     for step_num in range(self.args.num_steps_per_batch):
-                        self.model.train(explore_data)
+                        loss += self.model.train(explore_data)
 
             # Offline training
             for _ in range(num_offline):
@@ -107,7 +104,8 @@ class Trainer:
                 )
                 self.monitor.log_samples(round_num, truepolicy_data)
 
-            self.monitor.maybe_eval_samplelog(self.model, round_num, allXtoR)
+            self.monitor.maybe_eval_samplelog(self.model, round_num, allXtoR, (loss / num_online / self.args.num_steps_per_batch).detach().cpu().item())
+            loss = 0
 
             if round_num % self.args.save_every_x_active_rounds == 0:
                 if round_num > 0:
@@ -150,9 +148,6 @@ class Trainer:
         )
 
         for round_num in tqdm(range(self.args.num_active_learning_rounds)):
-            print(
-                f"Starting learning round {round_num + 1}/{self.args.num_active_learning_rounds} ..."
-            )
 
             # 1. Sample online x with explore policy
             for _ in range(num_online):

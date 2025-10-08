@@ -10,9 +10,7 @@ So we call wandb init here.
 """
 
 import torch
-import wandb
 import options
-from attrdict import AttrDict
 
 from exps.bag import bag
 from exps.tfbind8 import tfbind8_oracle
@@ -39,14 +37,14 @@ def main(args):
 if __name__ == "__main__":
     args = options.parse_args()
 
-    wandb.init(
-        project=args.wandb_project,
-        entity=args.wandb_entity,
-        config=args,
-        mode=args.wandb_mode,
-    )
-    args = AttrDict(wandb.config)
-    args.run_name = wandb.run.name if wandb.run.name else "None"
+    # wandb.init(
+    #     project=args.wandb_project,
+    #     entity=args.wandb_entity,
+    #     config=args,
+    #     mode=args.wandb_mode,
+    # )
+    # args = AttrDict(wandb.config)
+    # args.run_name = wandb.run.name if wandb.run.name else "None"
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"{device=}")
