@@ -9,6 +9,9 @@ Note: wandb isn't compatible with running scripts in subdirs:
 So we call wandb init here.
 """
 
+import os
+import random
+import numpy as np
 import torch
 import options
 
@@ -34,6 +37,13 @@ def main(args):
     return
 
 
+def fix_seed(seed):
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+
+
 if __name__ == "__main__":
     args = options.parse_args()
 
@@ -49,5 +59,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"{device=}")
     args.device = device
+
+    fix_seed(args.seed)
 
     main(args)

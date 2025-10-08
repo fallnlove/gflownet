@@ -106,7 +106,7 @@ def main(args):
     actor = actorclass(args, mdp)
     model = models.make_model(args, mdp, actor)
     writer = Writer()
-    writer.init(log_dir=args.log_path)
+    writer.init(log_dir=args.log_path + f"{args.seed}/")
     monitor = mdp.make_monitor(writer)
 
     # Save memory, after constructing monitor with target rewards

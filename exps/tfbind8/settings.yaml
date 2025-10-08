@@ -70,3 +70,5 @@ guide_sampling_temperature: 3.0
 
 # experiment-specific
 mdp_style: 'autoregressive' # ['insert', 'pa']
+
+seed: 42
