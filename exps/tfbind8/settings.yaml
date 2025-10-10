@@ -31,7 +31,7 @@ ssr_encoder_n_layers: 1
 ssr_embed_dim: 128
 ssr_scorer_hid_dim: 128
 ssr_scorer_n_layers: 1
-sa_hid_dim: 128
+sa_hid_dim: 256
 sa_n_layers: 2
 
 # trainer

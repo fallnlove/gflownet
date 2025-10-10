@@ -112,7 +112,7 @@ class Monitor:
         self.true_dist = self.target.rewards_dict
         self.empirical_dist = {k: 0 for k in self.true_dist.keys()}
         self.replay_buffer = []
-        self.replay_buffer_size = 1_000_000
+        self.replay_buffer_size = 200_000
 
     def log_samples(self, round_num, samples):
         """Logs samples."""

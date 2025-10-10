@@ -68,6 +68,7 @@ class Trainer:
             Each round: {num_online=}, {num_offline=}"
         )
         loss = 0
+        step = 0
 
         for round_num in tqdm(range(self.args.num_active_learning_rounds)):
 
@@ -75,9 +76,12 @@ class Trainer:
             if not initial_XtoR or round_num > 0:
                 for _ in range(num_online):
                     # Sample new dataset
+                    step += 1
+                    explore_epsilon = 1.0 * max(0, 1 - step / 50_000)
+
                     with torch.no_grad():
                         explore_data = self.model.batch_fwd_sample(
-                            online_bsize, epsilon=self.args.explore_epsilon
+                            online_bsize, epsilon=explore_epsilon
                         )
 
                     # Save to full dataset
