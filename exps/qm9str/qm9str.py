@@ -14,6 +14,7 @@ from rdkit import Chem
 from rdkit.Chem.rdMolDescriptors import GetMorganFingerprintAsBitVect
 from rdkit.DataStructs import FingerprintSimilarity
 
+from logger import Writer
 
 class QM9stringMDP(molstrmdp.MolStrMDP):
     def __init__(self, args):
@@ -73,13 +74,13 @@ class QM9stringMDP(molstrmdp.MolStrMDP):
     Interpretation & visualization
   """
 
-    def make_monitor(self):
+    def make_monitor(self, writer):
         """Make monitor, called during training."""
         target = TargetRewardDistribution()
         rs_all = list(self.scaled_oracle.values())
         target.init_from_base_rewards(rs_all)
         return Monitor(
-            self.args, target, dist_func=self.dist_states, is_mode_f=self.is_mode
+            self.args, target, dist_func=self.dist_states, is_mode_f=self.is_mode, writer=writer
         )
 
 
@@ -88,7 +89,9 @@ def main(args):
     mdp = QM9stringMDP(args)
     actor = molstrmdp.MolStrActor(args, mdp)
     model = models.make_model(args, mdp, actor)
-    monitor = mdp.make_monitor()
+    writer = Writer()
+    writer.init(log_dir=args.log_path + f"{args.seed}/")
+    monitor = mdp.make_monitor(writer)
     trainer = trainers.Trainer(args, model, mdp, actor, monitor)
     trainer.learn()
     return
