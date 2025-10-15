@@ -251,7 +251,7 @@ class SeqPAActor(Actor):
         self.forced_stop_len = mdp.forced_stop_len
 
         self.char_to_idx = {a: i for (i, a) in enumerate(self.alphabet)}
-        self.onehotencoder = OneHotEncoder(sparse=False)
+        self.onehotencoder = OneHotEncoder(sparse_output=False)
         self.onehotencoder.fit([[c] for c in self.alphabet])
 
         self.ft_dim = self.get_feature_dim()

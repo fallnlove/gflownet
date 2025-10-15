@@ -78,7 +78,7 @@ class QM9stringMDP(molstrmdp.MolStrMDP):
         """Make monitor, called during training."""
         target = TargetRewardDistribution()
         rs_all = list(self.scaled_oracle.values())
-        target.init_from_base_rewards(rs_all)
+        target.init_from_base_rewards(rs_all, self.scaled_oracle)
         return Monitor(
             self.args, target, dist_func=self.dist_states, is_mode_f=self.is_mode, writer=writer
         )
