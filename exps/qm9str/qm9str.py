@@ -38,7 +38,6 @@ class QM9stringMDP(molstrmdp.MolStrMDP):
         py = np.maximum(py, SCALE_MIN)
         py = py**REWARD_EXP
         py = py * (SCALE_REWARD_MAX / max(py))
-
         self.scaled_oracle = {x: y for x, y in zip(self.oracle.keys(), py) if y > 0}
         assert min(self.scaled_oracle.values()) > 0
 

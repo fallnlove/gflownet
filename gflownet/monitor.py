@@ -118,8 +118,8 @@ class Monitor:
         """Logs samples."""
         self.sample_log[round_num] = samples
         for exp in samples:
-            self.replay_buffer.append(exp.x)
-            self.empirical_dist[exp.x] += 1
+            self.replay_buffer.append(exp.x.content)
+            self.empirical_dist[exp.x.content] += 1
         if len(self.replay_buffer) > self.replay_buffer_size:
             for i in range(len(self.replay_buffer) - self.replay_buffer_size):
                 self.empirical_dist[self.replay_buffer[i]] -= 1
